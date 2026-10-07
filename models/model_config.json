@@ -1,0 +1,12 @@
+{
+  "decision_threshold": 0.9928,
+  "class_indices": {
+    "NORMAL": 0,
+    "PNEUMONIA": 1
+  },
+  "img_size": [
+    224,
+    224
+  ],
+  "notes": "Threshold tuned to balance recall vs false-alarm rate on held-out test set."
+}
