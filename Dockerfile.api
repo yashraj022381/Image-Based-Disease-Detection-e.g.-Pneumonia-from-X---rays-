@@ -1,0 +1,31 @@
+# ---- Backend API: FastAPI + TensorFlow/Keras + LangChain agentic pipeline ----
+FROM python:3.14-slim
+
+# System libraries needed at runtime by tensorflow / pillow / matplotlib
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libgl1 \
+    libglib2.0-0 \
+    libgomp1 \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Install Python deps first so this layer stays cached unless requirements.txt changes
+COPY requirements.txt .
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
+
+# No display in a container - force matplotlib's headless backend
+ENV MPLBACKEND=Agg
+# Lets "from src...." / "from api...." imports resolve from /app
+ENV PYTHONPATH=/app
+ENV PYTHONUNBUFFERED=1
+
+# App code + model weights (order: least-to-most frequently changed, for cache efficiency)
+COPY src/ ./src/
+COPY models/ ./models/
+COPY api/ ./api/
+
+EXPOSE 8000
+
+CMD ["uvicorn", "api.main:app", "--host", "0.0.0.0", "--port", "8000"]

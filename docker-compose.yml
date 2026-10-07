@@ -1,0 +1,33 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    container_name: pneumonia-api
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env        # must contain GROQ_API_KEY=... for the report-writer LLM calls
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/docs')"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  streamlit:
+    build:
+      context: .
+      dockerfile: Dockerfile.streamlit
+    container_name: pneumonia-streamlit
+    ports:
+      - "8501:8501"
+    environment:
+      # Inside the Docker network, "api" resolves to the api container via
+      # Docker's built-in DNS - this replaces the 127.0.0.1:8000 you use locally.
+      - API_BASE_URL=http://api:8000
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: unless-stopped

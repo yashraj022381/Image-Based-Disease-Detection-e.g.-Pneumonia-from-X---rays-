@@ -1,0 +1,24 @@
+# ---- Frontend: Streamlit UI, talks to the API container over HTTP ----
+FROM python:3.14-slim
+
+WORKDIR /app
+
+# NOTE: this installs the full requirements.txt (including tensorflow/langchain),
+# even though streamlit_app.py itself only needs streamlit + requests, because the
+# project currently keeps one shared requirements.txt for both services. This works
+# fine, it's just a bigger image than strictly necessary. If you want a lighter
+# frontend image later, split out a requirements-ui.txt with just:
+#   streamlit
+#   requests
+# and point this COPY/RUN at that file instead.
+COPY requirements.txt .
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
+
+ENV PYTHONUNBUFFERED=1
+
+COPY app/ ./app/
+
+EXPOSE 8501
+
+CMD ["streamlit", "run", "app/streamlit_app.py", "--server.address=0.0.0.0", "--server.port=8501"]

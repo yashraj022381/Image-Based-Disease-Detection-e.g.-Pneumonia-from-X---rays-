@@ -1,0 +1,27 @@
+# Virtual environment - installed directly inside the project root, so it
+# must be excluded or the build context (and image) balloons with it.
+Scripts/
+Lib/
+Include/
+etc/
+share/
+pyvenv.cfg
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Secrets - passed in at runtime via docker-compose's env_file, never baked into the image
+.env
+
+# VCS
+.git/
+.gitignore
+
+# Local-only test scripts, not needed inside the containers
+test_*.py
+
+# Editor/misc
+.vscode/
+*.log
