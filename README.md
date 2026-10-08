@@ -30,10 +30,6 @@ This is an educational / portfolio project, not a medical device. It has not bee
 📸 Screenshots
 
 
-> **Tip:** You can deploy both services easily with the included `docker-compose.yml` or host the Streamlit app on [Hugging Face Spaces](https://huggingface.co/spaces) / Streamlit Community Cloud and the API on Render / Railway / Fly.io.
-
----
-
 ✨ What This Project Does
 
  - Upload a chest X-ray and the system runs it through a 4-agent pipeline, orchestrated with LangGraph, in a single API call:
