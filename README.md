@@ -25,6 +25,22 @@ This is an educational / portfolio project, not a medical device. It has not bee
 
 📸 Screenshots
 
+|     Main - UI    |
+|:----------------:|
+| ![Main - UI](docs/screenshots/01_upload.png) |
+
+| Upload & Analyze | 
+|:----------------:|
+| ![Upload](docs/screenshots/02_upload.png) | 
+
+| Prediction + Grad-CAM |
+|:---------------------:|
+| ![Grad-CAM](docs/screenshots/03_gradcam.png) |
+
+| AI Educational Report |
+|:---------------------:|
+| ![Report](docs/screenshots/04_report.png) |
+
 
 ✨ What This Project Does
 
