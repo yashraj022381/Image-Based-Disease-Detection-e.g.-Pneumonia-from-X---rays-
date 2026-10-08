@@ -1,7 +1,6 @@
 # 🩺 Image-Based-Disease-Detection-e.g.-Pneumonia-from-X---rays-
 Detect medical conditions from radiology images.
 
-**Educational AI system that classifies chest X-rays as NORMAL or PNEUMONIA, generates Grad-CAM visual explanations, and produces a safety-checked educational radiology-style report using a multi-agent RAG pipeline.**
 
 [![Python](https://img.shields.io/badge/Python-3.10%2B-blue?logo=python&logoColor=white)](https://www.python.org/)
 [![TensorFlow](https://img.shields.io/badge/TensorFlow-2.x-orange?logo=tensorflow&logoColor=white)](https://www.tensorflow.org/)
@@ -14,19 +13,12 @@ Detect medical conditions from radiology images.
 
 [🌐 Live Demo](#-live-demo) · [📂 Dataset](#-dataset) · [🐛 Report Bug](https://github.com/yashraj022381/Image-Based-Disease-Detection-e.g.-Pneumonia-from-X---rays-/issues)
 
-</div>
+Agentic AI pipeline: CNN classification + Grad-CAM explainability + RAG-grounded reporting + automated safety checks
 
----
+⚠️ Disclaimer
 
-## ⚠️ Important Disclaimer
+This is an educational / portfolio project, not a medical device. It has not been clinically validated and must never be used for real diagnostic or treatment decisions. Every prediction and AI-generated report includes this same warning. Always consult a licensed physician or radiologist for real health concerns.
 
-> **This is an EDUCATIONAL / DEMONSTRATION project only.**  
-> It is **NOT** a medical device, has **NOT** been clinically validated, and must **never** be used for real diagnosis or treatment decisions.  
-> Always consult a licensed physician or radiologist for any health concern.
->
-> ---
-
-- 
 > ## 🌐 Live Demo
 
 | Service | Link |
@@ -34,9 +26,53 @@ Detect medical conditions from radiology images.
 | **Streamlit Frontend** | *[Add your deployed Streamlit / Hugging Face Space URL here]* |
 | **FastAPI Backend** | *[Add your deployed API URL here]* (docs at `/docs`) |
 
+📸 Screenshots
+
+
 > **Tip:** You can deploy both services easily with the included `docker-compose.yml` or host the Streamlit app on [Hugging Face Spaces](https://huggingface.co/spaces) / Streamlit Community Cloud and the API on Render / Railway / Fly.io.
 
 ---
+
+✨ What This Project Does
+
+ - Upload a chest X-ray and the system runs it through a 4-agent pipeline, orchestrated with LangGraph, in a single API call:
+
+   - Classifier — a CNN (TensorFlow/Keras) predicts PNEUMONIA vs NORMAL with a tuned decision threshold.
+    
+   - Explainer — generates a Grad-CAM heatmap showing which regions of the X-ray most influenced the prediction.
+     
+   - Report Writer — an LLM (Groq, openai/gpt-oss-120b) writes a structured FINDINGS / IMPRESSION / RECOMMENDATIONS report, grounded only in a retrieved radiology knowledge base (RAG) — it is explicitly instructed not to       invent clinical facts.
+     
+   - Safety Checker — a rule-based guardrail validates the generated report (required sections present, no overconfident/definitive diagnostic language, disclaimer present, predicted label and confidence actually               mentioned, no grounding mismatch).
+     
+   - If it fails, the pipeline automatically loops back and retries report generation (up to a configurable limit) before returning a result either way.
+
+   Upload X-ray
+     │
+     ▼
+┌─────────────┐      ┌─────────────┐      ┌────────────────┐      ┌─────────────────┐
+│  Classifier │ ──▶ │  Explainer  │ ──▶  │  Report Writer │ ──▶ │  Safety Checker │
+│  (CNN)      │      │  (Grad-CAM) │      │  (RAG + Groq)  │      │  (guardrail)    │
+└─────────────┘      └─────────────┘      └────────────────┘      └─────────┬────────┘
+                                                ▲                           │
+                                                └──── retry (≤2) ──────────┘ fail
+                                                                           │ pass
+                                                                           ▼
+                                                                   Final JSON response
+   
+     
+
+🧱 Tech Stack
+     Layer	                  Technology
+    ______________________________________________________
+     Model	                  TensorFlow / Keras CNN, Grad-CAM explainability
+     Agent orchestration	    LangGraph (stateful multi-agent graph with conditional retry edge)  
+     Report generation	      LangChain + Groq (openai/gpt-oss-120b)
+     Grounding	              Lightweight RAG over a radiology knowledge-base of reference findings/recommendations
+     Backend                  API	FastAPI + Uvicorn
+     Frontend	                Streamlit
+     Containerization	        Docker + Docker Compose (separate API and UI containers)
+     
 
 ## ✨ Features
 
@@ -52,6 +88,76 @@ Detect medical conditions from radiology images.
 - **Streamlit Frontend** – Simple, modern UI for uploading X-rays and viewing results
 - **Docker-Ready** – One-command deployment with `docker-compose`
 - **Safety First** – Multiple disclaimers + automatic guardrail checks on every generated report
+
+
+🚀 Getting Started
+
+  Option A — Docker (recommended)
+  
+  bash
+  git clone https://github.com/yashraj022381/Image-Based-Disease-Detection-e.g.-Pneumonia-from-X---rays-.git
+  cd Image-Based-Disease-Detection-e.g.-Pneumonia-from-X---rays-
+
+  cp .env.example .env
+  # edit .env and add your GROQ_API_KEY
+
+  docker compose up --build
+ 
+ > API: http://localhost:8000/docs
+ > Web app: http://localhost:8501
+
+
+  Option B — Manual (no Docker)
+  
+  bash
+  python -m venv venv
+  
+  # Windows:
+  venv\Scripts\activate
+  
+  # macOS/Linux:
+  source venv/bin/activate
+
+  pip install -r requirements.txt
+  cp .env.example .env   # add your GROQ_API_KEY
+
+  # Terminal 1 — API
+  uvicorn api.main:app --reload
+
+  # Terminal 2 — Web app
+  streamlit run app/streamlit_app.py
+
+📡 API Reference
+
+  Base URL: http://localhost:8000 (or your deployed API URL)
+
+  Endpoint	        Method	                  Description
+  /health	          GET	                      Health check
+  /predict	        POST (multipart file)	    Classification + Grad-CAM overlay only
+  /report	          POST (JSON)	              Generates a RAG-grounded report from a prior /predict result
+  /agentic-report	  POST (multipart file)	    Recommended. Runs the full 4-agent pipeline (Classifier → Explainer → Report Writer → Safety Checker) in one call, with automatic retry on guardrail failure
+  
+
+ <details> <summary>Example: <code>POST /agentic-report</code></summary>
+  bash
+  curl -X POST http://localhost:8000/agentic-report \
+  -F "file=@test_images/sample_pneumonia.jpeg"
+
+   
+  json
+  {
+    "predicted_label": "PNEUMONIA",
+    "probability": 0.9991,
+    "threshold": 0.9928,
+    "overlay_image_base64": "data:image/png;base64,....",
+    "report_text": "**FINDINGS:**\n...\n\n**IMPRESSION:**\n...\n\n**RECOMMENDATIONS:**\n...",
+    "grounding_sources": ["doc_pneumonia_findings", "doc_recommendation_pneumonia", "doc_limitations", "doc_ai_disclaimer"],
+    "guardrail_passed": true,
+    "guardrail_issues": [],
+    "retries_used": 0,
+    "disclaimer": "This is an educational AI demonstration, NOT a real medical diagnosis. Consult a licensed physician or radiologist for any real health concern."
+ }
+ </details>
 
 
 ## 📂 Dataset
@@ -71,84 +177,38 @@ The model was trained on the well-known **Chest X-Ray Images (Pneumonia)** datas
 > The trained model (`models/stage2_final`) and config (`models/model_config.json`) are already included in this repository, so you do **not** need to retrain to run the demo.
 
 
+🧠 Model Details
+	
+  Input	                 224×224 RGB chest X-ray
+  Classes	               NORMAL, PNEUMONIA
+  Decision threshold	   0.9928 (tuned to balance recall vs. false-alarm rate on a held-out test set)
+  Explainability	       Grad-CAM on the final convolutional layer
+  
+  <! -- TODO: name and link the dataset this model was trained on, e.g. the Kaggle "Chest X-Ray Images (Pneumonia)" dataset -->
+
+   Training/EDA notebook: notebooks/eda_and_prototyping.ipynb
+
+
 ## 🏗️ Project Structure
 
-
    pneumonia-detector
-   ├── api/
-   │   └── main.py                 # FastAPI application
-   ├── app/
-   │   └── streamlit_app.py        # Streamlit frontend
-   ├── models/
-   │   ├── stage2_final/           # Trained TensorFlow model
-   │   └── model_config.json       # Threshold & class indices
-   ├── notebooks/
-   │   └── eda_and_prototyping.ipynb
+   ├── api/              # FastAPI app (predict / report / agentic-report endpoints)
+   ├── app/              # Streamlit frontend
    ├── src/
-   │   ├── agents/
-   │   │   └── pipeline_graph.py   # LangGraph multi-agent pipeline
-   │   ├── genai/
-   │   │   ├── guardrails.py
-   │   │   ├── knowledge_base.py
-   │   │   ├── rag_store.py
-   │   │   └── report_chain.py     # Groq + RAG report generation
-   │   └── inference.py            # Model loading, preprocessing, Grad-CAM
-   ├── test_images/                # Sample X-rays for testing
+   │   ├── inference.py        # Model loading, preprocessing, Grad-CAM
+   │   ├── agents/              # LangGraph pipeline definition (4-agent graph)
+   │   └── genai/
+   │       ├── report_chain.py   # LLM report generation (Groq)
+   │       ├── rag_store.py      # Retrieval over the knowledge base
+   │       ├── knowledge_base.py # Reference radiology findings/recommendations
+   │       └── guardrails.py     # Rule-based safety checker
+   ├── models/            # Trained model weights + config
+   ├── test_images/        # Sample X-rays for quick testing
+   ├── notebooks/          # Model training / EDA
    ├── Dockerfile.api
    ├── Dockerfile.streamlit
-   ├── docker-compose.yml
-   ├── requirements.txt
-   └── README.md
+   └── docker-compose.yml
 
-🚀 Quick Start
-
-   1. Clone the repository
-      Bash
-        git clone https://github.com/yashraj022381/Image-Based-Disease-Detection-e.g.-Pneumonia-from-X---rays-.git
-        cd Image-Based-Disease-Detection-e.g.-Pneumonia-from-X---rays-
-      
-   2. Create a virtual environment & install dependencies
-      Bash
-        python -m venv venv
-        source venv/bin/activate          # Windows: venv\Scripts\activate
-        pip install -r requirements.txt
-
-   3. Set up environment variables
-      Create a .env file in the root:
-     env
-       GROQ_API_KEY=your_groq_api_key_here
-     The Report Writer agent needs a Groq API key (free tier works fine).
-
-   4. Run locally (two terminals)
-     Terminal 1 – FastAPI backend
-     Bash
-        uvicorn api.main:app --reload --host 0.0.0.0 --port 8000
-     Terminal 2 – Streamlit frontend
-     Bash
-       streamlit run app/streamlit_app.py
-     Open http://localhost:8501 in your browser.
-     
-   5. Run with Docker (recommended)
-      Bash
-        docker-compose up --build
-
-   - Streamlit UI → http://localhost:8501
-   - FastAPI docs → http://localhost:8000/docs
-
-
-🔌 API Endpoints
-
-   Method       Endpoint                Description
-   GET          /health                 Health check
-   POST         /predict                Upload X-ray → prediction + Grad-CAM
-   POST         /report                 Generate educational report from prediction
-   POST         /agentic-report         Full multi-agent pipeline (recommended)
-
-
-Example (/agentic-report):
-   Bash
-     curl -X POST "http://localhost:8000/agentic-report" \
-     -F "file=@test_images/sample_pneumonia.jpeg"
 
 
 🧠 How the Multi-Agent Pipeline Works
@@ -180,18 +240,6 @@ Example (/agentic-report):
            ▼
       Final Result
 
-
-🛠️ Tech Stack
-
-   Layer                 Technology
-   Deep Learning         TensorFlow / Keras
-   Explainability        Grad-CAM
-   Backend               FastAPI + Uvicorn
-   Frontend              Streamlit
-   Agent Orchestration   LangGraph
-   LLM + RAG             LangChain + Groq (openai/gpt-oss-120b)
-   Containerization      Docker + Docker Compose
-
 🧪 Testing
 
    Several test scripts are included:
@@ -202,23 +250,9 @@ Example (/agentic-report):
     python test_report.py
 
 
-📜 License & Citation
+📄 License
 
-  - This project is released for educational and research purposes only.
-  - If you use the underlying dataset, please cite:
-    bibtex
-      @article
-      {
-          kermany2018identifying,
-          title={Identifying Medical Diagnoses and Treatable Diseases by Image-Based Deep Learning},
-          author={Kermany, Daniel S and Goldbaum, Michael and Cai, Wenjia and others},
-          journal={Cell},
-          volume={172},
-          number={5},
-          pages={1122--1131},
-          year={2018},
-          publisher={Elsevier}
-      }
+  This project is licensed under the MIT License.
 
 🤝 Contributing
 
