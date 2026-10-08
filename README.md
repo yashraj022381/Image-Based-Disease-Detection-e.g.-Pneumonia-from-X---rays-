@@ -1,4 +1,6 @@
 # 🩺 Image-Based-Disease-Detection-e.g.-Pneumonia-from-X---rays-
+Agentic AI pipeline: CNN classification + Grad-CAM explainability + RAG-grounded reporting + automated safety checks
+
 Detect medical conditions from radiology images.
 
 
@@ -13,7 +15,6 @@ Detect medical conditions from radiology images.
 
 [🌐 Live Demo](#-live-demo) · [📂 Dataset](#-dataset) · [🐛 Report Bug](https://github.com/yashraj022381/Image-Based-Disease-Detection-e.g.-Pneumonia-from-X---rays-/issues)
 
-Agentic AI pipeline: CNN classification + Grad-CAM explainability + RAG-grounded reporting + automated safety checks
 
 ⚠️ Disclaimer
 
