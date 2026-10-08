@@ -13,11 +13,6 @@ Detect medical conditions from radiology images.
 [![License](https://img.shields.io/badge/License-Educational%20Use-yellow)](#disclaimer)
 
 
-[🌐 Live Demo]
-
-  [![Try the App](https://img.shields.io/badge/Try%20Live%20Demo-Click%20Here-brightgreen?style=for-the-badge&logo=streamlit)](https://dbuqgxlmndxfofj7w7h2of.streamlit.app/)
-
-
 
 ⚠️ Disclaimer
 
@@ -25,10 +20,8 @@ This is an educational / portfolio project, not a medical device. It has not bee
 
 > ## 🌐 Live Demo
 
-| Service | Link |
-|---------|------|
-| **Streamlit Frontend** | *[Add your deployed Streamlit / Hugging Face Space URL here]* |
-| **FastAPI Backend** | *[Add your deployed API URL here]* (docs at `/docs`) |
+  [![Try the App](https://img.shields.io/badge/Try%20Live%20Demo-Click%20Here-brightgreen?style=for-the-badge&logo=streamlit)](https://dbuqgxlmndxfofj7w7h2of.streamlit.app/)
+
 
 📸 Screenshots
 
