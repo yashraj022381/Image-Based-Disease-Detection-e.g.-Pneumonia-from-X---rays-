@@ -32,11 +32,11 @@ def _is_negated(text_lower: str, phrase: str) -> bool:
     idx = text_lower.find(phrase)
     if idx == -1:
         return False
-    preceding_words = text_lower[:idx].aplit()[-NEGATION_WINDOW]
+    preceding_words = text_lower[:idx].split()[-NEGATION_WINDOW:]
     return any(
         neg_word in word
         for word in preceding_words
-        for neg_words in NEGATION_WORDS
+        for neg_word in NEGATION_WORDS
     )
 
     
@@ -126,21 +126,3 @@ def check_report(report_result: dict) -> dict:
         "issues": issues,
         "checked_sections": REQUIRED_SECTIONS,
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-            
