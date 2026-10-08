@@ -94,7 +94,7 @@ def report(request: ReportRequest):
     }
 
 
-#logger = logging.getLogger("uvicorn.error")
+logger = logging.getLogger("uvicorn.error")
 
 @app.post("/agentic-report")
 async def agentic_report(file: UploadFile = File(...)):
@@ -112,8 +112,8 @@ async def agentic_report(file: UploadFile = File(...)):
         image_bytes = await file.read()
         result = run_pipeline(image_bytes)
     except Exception as e:
-        #logger.error("Agentic pipeline failed:\n%s", traceback.format_exc())
-        raise HTTPException(status_code=500, detail="Agentic pipeline failed: {str(e)}")
+        logger.error("Agentic pipeline failed:\n%s", traceback.format_exc())
+        raise HTTPException(status_code=500, detail=f"Agentic pipeline failed: {str(e)}")
 
     result["disclaimer"] = (
         "This is an educational AI demonstration, NOT a real medical diagnosis. "
