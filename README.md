@@ -13,7 +13,10 @@ Detect medical conditions from radiology images.
 [![License](https://img.shields.io/badge/License-Educational%20Use-yellow)](#disclaimer)
 
 
-[🌐 Live Demo](#-live-demo) · [📂 Dataset](#-dataset) · [🐛 Report Bug](https://github.com/yashraj022381/Image-Based-Disease-Detection-e.g.-Pneumonia-from-X---rays-/issues)
+[🌐 Live Demo]
+
+  [![Try the App](https://img.shields.io/badge/Try%20Live%20Demo-Click%20Here-brightgreen?style=for-the-badge&logo=streamlit)](https://dbuqgxlmndxfofj7w7h2of.streamlit.app/)
+
 
 
 ⚠️ Disclaimer
