@@ -1,1 +1,14 @@
 
+# Streamlit Community Cloud dependencies (used because this file sits next to
+# app/streamlit_app.py, which Streamlit Cloud checks before the root file).
+# The root requirements.txt is left untouched for the Docker/FastAPI setup.
+streamlit
+tensorflow==2.21.0
+numpy
+pillow
+matplotlib
+scikit-learn
+langgraph
+langchain-core
+langchain-groq
+python-dotenv
